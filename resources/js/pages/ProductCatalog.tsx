@@ -1,15 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { getProducts, createOrder } from '../services/api';
+import { getProducts } from '../services/products';
+import { createOrder } from '../services/orders';
 import Layout from '../components/Layout';
+import { Product } from '../types/models';
+
+interface CartItem {
+    product_id: number;
+    product: Product;
+    quantity: number;
+    price: number;
+}
 
 /**
  * ProductCatalog - Halaman daftar produk dengan cart & checkout
  */
 export default function ProductCatalog() {
-    const [products, setProducts] = useState([]);
+    const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [cart, setCart] = useState([]);
+    const [error, setError] = useState<string | null>(null);
+    const [cart, setCart] = useState<CartItem[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [showCart, setShowCart] = useState(false);
     const [checkoutLoading, setCheckoutLoading] = useState(false);
@@ -25,14 +34,14 @@ export default function ProductCatalog() {
             
             const response = await getProducts();
             setProducts(response.data);
-        } catch (err) {
+        } catch (err: any) {
             setError(err.message || 'Gagal mengambil data produk');
         } finally {
             setLoading(false);
         }
     };
 
-    const formatPrice = (price) => {
+    const formatPrice = (price: number) => {
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
             currency: 'IDR',
@@ -41,7 +50,7 @@ export default function ProductCatalog() {
     };
 
     // Cart Functions
-    const addToCart = (product) => {
+    const addToCart = (product: Product) => {
         const existingItem = cart.find(item => item.product_id === product.id);
         
         if (existingItem) {
@@ -63,7 +72,7 @@ export default function ProductCatalog() {
         setShowCart(true);
     };
 
-    const updateQuantity = (productId, newQuantity) => {
+    const updateQuantity = (productId: number, newQuantity: number) => {
         if (newQuantity <= 0) {
             removeFromCart(productId);
         } else {
@@ -75,7 +84,7 @@ export default function ProductCatalog() {
         }
     };
 
-    const removeFromCart = (productId) => {
+    const removeFromCart = (productId: number) => {
         setCart(cart.filter(item => item.product_id !== productId));
     };
 
@@ -118,7 +127,7 @@ export default function ProductCatalog() {
             
             // Refresh products untuk update stok
             fetchProducts();
-        } catch (err) {
+        } catch (err: any) {
             alert(err.message || 'Gagal membuat order');
         } finally {
             setCheckoutLoading(false);

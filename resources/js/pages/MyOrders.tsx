@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { getOrders } from '../services/api';
+import { getOrders } from '../services/orders';
 import Layout from '../components/Layout';
+import { Order } from '../types/models';
 
 export default function MyOrders() {
-    const [orders, setOrders] = useState([]);
+    const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
 
@@ -19,14 +20,14 @@ export default function MyOrders() {
             setError(null);
             const response = await getOrders();
             setOrders(response.data);
-        } catch (err) {
+        } catch (err: any) {
             setError(err.message || 'Gagal mengambil data order');
         } finally {
             setLoading(false);
         }
     };
 
-    const formatCurrency = (amount) => {
+    const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
             currency: 'IDR',
@@ -34,8 +35,8 @@ export default function MyOrders() {
         }).format(amount);
     };
 
-    const getStatusBadge = (status) => {
-        const badges = {
+    const getStatusBadge = (status: string) => {
+        const badges: Record<string, { bg: string; text: string; label: string }> = {
             pending: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Pending' },
             paid: { bg: 'bg-blue-100', text: 'text-blue-800', label: 'Dibayar' },
             shipped: { bg: 'bg-green-100', text: 'text-green-800', label: 'Dikirim' },

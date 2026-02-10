@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { getUser, logout as apiLogout } from '../services/api';
+import { getUser } from '../services/http';
+import { logout as apiLogout } from '../services/auth';
 
 export default function Sidebar() {
     const location = useLocation();

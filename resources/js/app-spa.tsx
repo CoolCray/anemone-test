@@ -14,7 +14,7 @@ import MyOrders from './pages/MyOrders';
 
 // Components
 import ProtectedRoute from './components/ProtectedRoute';
-import { getAuthToken, getUser } from './services/api';
+import { getAuthToken, getUser } from './services/http';
 
 function App() {
     const token = getAuthToken();

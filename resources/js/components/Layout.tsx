@@ -1,7 +1,11 @@
 import React from 'react';
 import Sidebar from './Sidebar';
 
-export default function Layout({ children }) {
+interface LayoutProps {
+    children: React.ReactNode;
+}
+
+export default function Layout({ children }: LayoutProps) {
     return (
         <div className="flex h-screen bg-gray-50 overflow-hidden">
             {/* Sidebar */}

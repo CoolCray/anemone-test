@@ -1,11 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { getDashboardSummary } from '../services/api';
+import { getDashboardSummary } from '../services/dashboard';
 import Layout from '../components/Layout';
 
+interface DashboardData {
+    total_products: number;
+    total_orders: number;
+    total_revenue: number;
+    orders_by_status: {
+        pending: number;
+        paid: number;
+        shipped: number;
+        completed: number;
+        cancelled: number;
+    };
+}
+
 export default function Dashboard() {
-    const [data, setData] = useState(null);
+    const [data, setData] = useState<DashboardData | null>(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         fetchDashboard();
@@ -16,15 +29,16 @@ export default function Dashboard() {
             setLoading(true);
             setError(null);
             const response = await getDashboardSummary();
-            setData(response.data);
-        } catch (err) {
+            // Cast to unknown first because API returns object 
+            setData(response.data as unknown as DashboardData);
+        } catch (err: any) {
             setError(err.message || 'Gagal mengambil data dashboard');
         } finally {
             setLoading(false);
         }
     };
 
-    const formatCurrency = (amount) => {
+    const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
             currency: 'IDR',

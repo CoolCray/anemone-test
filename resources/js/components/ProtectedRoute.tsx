@@ -1,10 +1,16 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { getAuthToken, getUser } from '../services/api';
+import { getAuthToken, getUser } from '../services/http';
+import { User } from '../types/models';
 
-export default function ProtectedRoute({ children, allowedRoles = [] }) {
+interface ProtectedRouteProps {
+    children: React.ReactNode;
+    allowedRoles?: string[];
+}
+
+export default function ProtectedRoute({ children, allowedRoles = [] }: ProtectedRouteProps) {
     const token = getAuthToken();
-    const user = getUser();
+    const user = getUser() as User | null;
 
     // Jika tidak ada token, redirect ke login
     if (!token || !user) {
@@ -21,5 +27,5 @@ export default function ProtectedRoute({ children, allowedRoles = [] }) {
         }
     }
 
-    return children;
+    return <>{children}</>;
 }

@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { getOrders, updateOrderStatus } from '../services/api';
+import { getOrders, updateOrderStatus } from '../services/orders';
 import Layout from '../components/Layout';
+import { Order } from '../types/models';
 
 export default function AllOrders() {
-    const [orders, setOrders] = useState([]);
+    const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [updatingOrderId, setUpdatingOrderId] = useState(null);
+    const [error, setError] = useState<string | null>(null);
+    const [updatingOrderId, setUpdatingOrderId] = useState<number | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
 
@@ -20,14 +21,14 @@ export default function AllOrders() {
             setError(null);
             const response = await getOrders();
             setOrders(response.data);
-        } catch (err) {
+        } catch (err: any) {
             setError(err.message || 'Gagal mengambil data order');
         } finally {
             setLoading(false);
         }
     };
 
-    const handleStatusUpdate = async (orderId, newStatus) => {
+    const handleStatusUpdate = async (orderId: number, newStatus: Order['status']) => {
         try {
             setUpdatingOrderId(orderId);
             await updateOrderStatus(orderId, newStatus);
@@ -35,14 +36,14 @@ export default function AllOrders() {
             setOrders(orders.map(order => 
                 order.id === orderId ? { ...order, status: newStatus } : order
             ));
-        } catch (err) {
+        } catch (err: any) {
             alert(err.message || 'Gagal update status order');
         } finally {
             setUpdatingOrderId(null);
         }
     };
 
-    const formatCurrency = (amount) => {
+    const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
             currency: 'IDR',
@@ -50,8 +51,8 @@ export default function AllOrders() {
         }).format(amount);
     };
 
-    const getStatusBadge = (status) => {
-        const badges = {
+    const getStatusBadge = (status: string) => {
+        const badges: Record<string, string> = {
             pending: 'bg-yellow-100 text-yellow-800',
             paid: 'bg-blue-100 text-blue-800',
             shipped: 'bg-green-100 text-green-800',
@@ -242,7 +243,7 @@ export default function AllOrders() {
                                 <label className="block text-sm font-medium text-gray-700 mb-2">Update Status:</label>
                                 <select
                                     value={order.status}
-                                    onChange={(e) => handleStatusUpdate(order.id, e.target.value)}
+                                    onChange={(e) => handleStatusUpdate(order.id, e.target.value as Order['status'])}
                                     disabled={updatingOrderId === order.id}
                                     className="w-full md:w-auto px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
                                 >

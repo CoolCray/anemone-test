@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { getProducts, createProduct, updateProduct, deleteProduct } from '../services/api';
+import { getProducts, createProduct, updateProduct, deleteProduct } from '../services/products';
 import Layout from '../components/Layout';
+import { Product } from '../types/models';
 
 export default function ProductManagement() {
-    const [products, setProducts] = useState([]);
+    const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<string | null>(null);
     const [showForm, setShowForm] = useState(false);
     const [formData, setFormData] = useState({ name: '', price: '', stock: '' });
     const [submitting, setSubmitting] = useState(false);
-    const [editingId, setEditingId] = useState(null);
+    const [editingId, setEditingId] = useState<number | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
@@ -22,14 +23,14 @@ export default function ProductManagement() {
             setError(null);
             const response = await getProducts();
             setProducts(response.data);
-        } catch (err) {
+        } catch (err: any) {
             setError(err.message || 'Gagal mengambil data produk');
         } finally {
             setLoading(false);
         }
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
             setSubmitting(true);
@@ -49,14 +50,14 @@ export default function ProductManagement() {
             setShowForm(false);
             setEditingId(null);
             fetchProducts();
-        } catch (err) {
+        } catch (err: any) {
             alert(err.message || 'Gagal menyimpan produk');
         } finally {
             setSubmitting(false);
         }
     };
 
-    const handleEdit = (product) => {
+    const handleEdit = (product: Product) => {
         setEditingId(product.id);
         setFormData({
             name: product.name,
@@ -66,7 +67,7 @@ export default function ProductManagement() {
         setShowForm(true);
     };
 
-    const handleDelete = async (productId) => {
+    const handleDelete = async (productId: number) => {
         if (!confirm('Apakah Anda yakin ingin menghapus produk ini?')) {
             return;
         }
@@ -74,7 +75,7 @@ export default function ProductManagement() {
         try {
             await deleteProduct(productId);
             fetchProducts();
-        } catch (err) {
+        } catch (err: any) {
             alert(err.message || 'Gagal menghapus produk');
         }
     };
@@ -85,7 +86,7 @@ export default function ProductManagement() {
         setShowForm(false);
     };
 
-    const formatCurrency = (amount) => {
+    const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
             currency: 'IDR',

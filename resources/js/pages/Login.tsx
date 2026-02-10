@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login as apiLogin } from '../services/api';
+import { login as apiLogin } from '../services/auth';
+import { User } from '../types/models';
 
 export default function Login() {
     const [email, setEmail] = useState('');
@@ -9,21 +10,22 @@ export default function Login() {
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
         setLoading(true);
 
         try {
             const response = await apiLogin(email, password);
+            const user = response.user as User;
             
             // Redirect berdasarkan role
-            if (response.user.role === 'ho') {
+            if (user.role === 'ho') {
                 navigate('/dashboard');
             } else {
                 navigate('/catalog');
             }
-        } catch (err) {
+        } catch (err: any) {
             setError(err.message || 'Login gagal. Silakan coba lagi.');
         } finally {
             setLoading(false);
@@ -31,7 +33,7 @@ export default function Login() {
     };
 
     // Quick login buttons untuk testing
-    const quickLogin = async (userEmail, userPassword) => {
+    const quickLogin = async (userEmail: string, userPassword: string) => {
         setEmail(userEmail);
         setPassword(userPassword);
         setError('');
@@ -39,13 +41,14 @@ export default function Login() {
 
         try {
             const response = await apiLogin(userEmail, userPassword);
+            const user = response.user as User;
             
-            if (response.user.role === 'ho') {
+            if (user.role === 'ho') {
                 navigate('/dashboard');
             } else {
                 navigate('/catalog');
             }
-        } catch (err) {
+        } catch (err: any) {
             setError(err.message || 'Login gagal. Silakan coba lagi.');
         } finally {
             setLoading(false);
