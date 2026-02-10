@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import '../css/app.css';
 
@@ -15,10 +14,28 @@ import MyOrders from './pages/MyOrders';
 // Components
 import ProtectedRoute from './components/ProtectedRoute';
 import { getAuthToken, getUser } from './services/http';
+import { User } from './types/models';
 
 function App() {
-    const token = getAuthToken();
-    const user = getUser();
+    const [token, setToken] = useState<string | null>(null);
+    const [user, setUser] = useState<User | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        // Load auth state once on mount
+        setToken(getAuthToken());
+        setUser(getUser());
+        setIsLoading(false);
+    }, []);
+
+    // Show loading state while checking auth
+    if (isLoading) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            </div>
+        );
+    }
 
     return (
         <BrowserRouter>
@@ -97,8 +114,6 @@ const el = document.getElementById('app');
 if (el) {
     const root = createRoot(el);
     root.render(
-        <StrictMode>
-            <App />
-        </StrictMode>
+        <App />
     );
 }
